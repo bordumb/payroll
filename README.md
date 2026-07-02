@@ -76,7 +76,7 @@ Nothing else changes — the two steps below work the same either way.
    ```
    To run an earlier or specific period, add the date:
    ```
-   python run_payroll.py read --date 2026-06-15
+   python run_payroll.py read --date 2026-06-01
    ```
    This creates `hours_to_review.csv` inside that period's folder.
 4. **Open `hours_to_review.csv` and check it against the paper timesheets.**
@@ -84,7 +84,7 @@ Nothing else changes — the two steps below work the same either way.
    important step — everything after it is just multiplication.
 5. **Step 2 — do the pay** (use the same date you used in step 1):
    ```
-   python run_payroll.py pay --date 2026-06-15
+   python run_payroll.py pay --date 2026-06-01
    ```
    This creates `payroll_final.csv` in the same folder and prints a summary.
 
@@ -124,9 +124,9 @@ You will see a file called `create_dummy_timesheet_pdf.py`, which creates a fake
 
 You can run it using this:
 ```bash
-python make_sample_timesheet.py --date 2026-06-15
-python run_payroll.py read --date 2026-06-15
-python run_payroll.py pay  --date 2026-06-15
+python make_sample_timesheet.py --date 2026-06-01
+python run_payroll.py read --date 2026-06-01
+python run_payroll.py pay  --date 2026-06-01
 ```
 
 Which does this:
