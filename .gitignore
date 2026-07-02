@@ -1,0 +1,41 @@
+# ---- Payroll data (real names, hours, wages, pay) — never commit ----
+payroll/
+hours_to_review.csv
+payroll_final.csv
+
+# Real wage file stays local; the tracked template is employee_rates.example.csv
+employee_rates/employee_rates.csv
+!employee_rates/employee_rates.example.csv
+
+# ---- Secrets/API Keys ----
+.env
+.env.*
+!.env.example
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# ---- Virtual environments ----
+.venv/
+venv/
+env/
+
+# ---- Tooling caches ----
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+
+# ---- Editors / OS ----
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db

@@ -13,6 +13,7 @@ the timesheets in, and the tool writes its results back into the same folder.
 
 ```
 payroll_tool/
+    .env                      <- a hidden file that you can save your API key to (See below)
     run_payroll.py            <- the thing you run
     payroll.py                <- the money maths
     timesheets.py             <- reads the handwriting
@@ -40,9 +41,13 @@ Do this once. You only need one of the two options below.
 1. Install Python 3.10 or newer.
 2. In a terminal in this folder:  `pip install -r requirements.txt`
 3. Get a key from https://console.anthropic.com and tell your computer about it.
-   Your mom never types this — it's a one-time step:
-   - **Mac/Linux:** `export ANTHROPIC_API_KEY="your-key-here"`
-   - **Windows:** `setx ANTHROPIC_API_KEY "your-key-here"` (then reopen the terminal)
+   Your mom never types this — it's a one-time step. Pick either way:
+   - **Recommended — a `.env` file:** copy `.env.example` to `.env` and put your
+     key in it (`ANTHROPIC_API_KEY=sk-ant-...`). The tool loads it automatically,
+     and `.env` is git-ignored so the key never gets committed.
+   - **Or a shell variable (Mac/Linux):** `export ANTHROPIC_API_KEY="your-key-here"`
+
+> Note: it's important to keep your API key safe. It's like a password for access to your Claude account. If someone else gains access to it, they can charge your account and steal your balance.
 
 ### Option B — Local reader (no key, no cost, runs on your computer)
 
@@ -112,3 +117,19 @@ worked is ever dropped; they show up with a note instead, so you can fix it.
 - `timesheets_ollama.py` — the local, no-key reader you can swap in (Option B).
 - `employee_rates/employee_rates.csv` — your list of who earns what.
 - `requirements.txt` / `requirements-local.txt` — what to install for each option.
+
+## Testing
+
+You will see a file called `create_dummy_timesheet_pdf.py`, which creates a fake PDF to help simulate the workflow.
+
+You can run it using this:
+```bash
+python make_sample_timesheet.py --date 2026-06-15
+python run_payroll.py read --date 2026-06-15
+python run_payroll.py pay  --date 2026-06-15
+```
+
+Which does this:
+- drops a PDF into payroll/2026/06/15/
+- your real reader transcribes it
+- produces payroll_final.csv

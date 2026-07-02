@@ -14,6 +14,12 @@ import os
 from pathlib import Path
 
 from anthropic import Anthropic
+from dotenv import load_dotenv
+
+# Read ANTHROPIC_API_KEY (and any other secrets) from a local .env file if one
+# is present, so the key can live in .env instead of your shell profile. The
+# .env file is git-ignored and never committed.
+load_dotenv()
 
 # Options
 # Expensive/Accurate: claude-opus-4-8 
@@ -86,7 +92,14 @@ def read_all_timesheets(folder: Path, out_csv: Path) -> int:
     from, so a person can check the CSV against the paper. Returns the number of
     rows written.
     """
-    client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        raise RuntimeError(
+            "ANTHROPIC_API_KEY is not set. Put it in a .env file in the project "
+            "root as ANTHROPIC_API_KEY=sk-ant-... (see .env.example), or export "
+            "it in your shell."
+        )
+    client = Anthropic(api_key=api_key)
     files = find_timesheets(folder)
     if not files:
         raise FileNotFoundError(f"No images or PDFs found in {folder}")
