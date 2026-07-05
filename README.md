@@ -16,7 +16,7 @@ payroll_tool/
     .env                      <- a hidden file that you can save your API key to (See below)
     run_payroll.py            <- the thing you run
     payroll.py                <- the money maths
-    timesheets.py             <- reads the handwriting
+    timesheets.py             <- picks cloud or local, then reads the handwriting
     employee_rates/
         employee_rates.csv    <- who earns what (shared by every period)
     payroll/
@@ -58,11 +58,15 @@ computer (about 8 GB of memory, 16 GB is better) and is slower.
 2. Install Ollama from https://ollama.com/download
 3. Download a vision model:  `ollama pull qwen2.5vl`
 4. In a terminal in this folder:  `pip install -r requirements-local.txt`
-5. Switch the tool to the local reader by renaming the files:
-   - rename `timesheets.py` to `timesheets_api.py` (keeps it as a backup)
-   - rename `timesheets_ollama.py` to `timesheets.py`
+5. Tell the tool to use it, either way:
+   - **In `.env`:** copy `.env.example` to `.env` if you haven't already, and
+     set `READER=local` (no API key needed for this option).
+   - **Or per run:** add `--reader local` to the command, for example
+     `python run_payroll.py read --reader local`.
 
-Nothing else changes — the two steps below work the same either way.
+Nothing else changes — the two steps below work the same either way. Switch
+back to the cloud reader any time with `READER=cloud` (or `--reader cloud`) —
+no renaming files, no reinstalling.
 
 ## Every pay period
 
@@ -104,17 +108,19 @@ worked is ever dropped; they show up with a note instead, so you can fix it.
   added together.
 - Pay is simple `hours x rate`. It does **not** add overtime, tax, or
   deductions — that matches the current by-hand process.
-- To try a different local model (Option B), open `timesheets.py` and change
-  `MODEL` (for example to `minicpm-v` or `llama3.2-vision`).
-- To try a cheaper cloud model (Option A), open `timesheets.py` and change
-  `MODEL` from `claude-opus-4-8` to `claude-sonnet-5`.
+- To try a different local model (Option B), open `timesheets_ollama.py` and
+  change `MODEL` (for example to `minicpm-v` or `llama3.2-vision`).
+- To try a different cloud model (Option A), open `timesheets_api.py` and
+  change `MODEL` (for example between `claude-sonnet-5` and `claude-opus-4-8`).
 
 ## The files
 
 - `run_payroll.py` — the thing you run. Settings (folder paths) are at the top.
 - `payroll.py` — the money maths (Step 2). Unchanged whichever reader you use.
-- `timesheets.py` — reads the handwriting (Step 1).
-- `timesheets_ollama.py` — the local, no-key reader you can swap in (Option B).
+- `timesheets.py` — picks the reader (Step 1), via `--reader` or the `READER`
+  env var.
+- `timesheets_api.py` — the cloud reader, Claude vision (Option A).
+- `timesheets_ollama.py` — the local, no-key reader, Ollama (Option B).
 - `employee_rates/employee_rates.csv` — your list of who earns what.
 - `requirements.txt` / `requirements-local.txt` — what to install for each option.
 

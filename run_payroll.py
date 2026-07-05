@@ -46,10 +46,15 @@ def period_folder(day: date) -> Path:
     return PAYROLL_ROOT / f"{day.year:04d}" / f"{day.month:02d}" / f"{day.day:02d}"
 
 
-def read_step(folder: Path) -> None:
-    """Step 1: OCR the timesheets in ``folder`` into a CSV for a human to check."""
+def read_step(folder: Path, reader_name: str | None) -> None:
+    """Step 1: OCR the timesheets in ``folder`` into a CSV for a human to check.
+
+    ``reader_name`` picks 'cloud' or 'local' (see ``timesheets.get_reader``);
+    ``None`` falls back to the ``READER`` env var, then 'cloud'.
+    """
+    reader = timesheets.get_reader(reader_name)
     hours_csv = folder / HOURS_FILENAME
-    count = timesheets.read_all_timesheets(folder, hours_csv)
+    count = reader.read_all_timesheets(folder, hours_csv)
     print(f"\nWrote {count} row(s) to {hours_csv}.")
     print("Please open that file, check it against the paper timesheets, fix any")
     print("mistakes, then run:  python run_payroll.py pay")
@@ -66,8 +71,8 @@ def pay_step(folder: Path) -> None:
     print(payroll.summarize(lines))
 
 
-def main() -> None:
-    """Resolve the pay-period folder from the chosen date and run the step."""
+def build_parser() -> argparse.ArgumentParser:
+    """Build the CLI parser (its own function so tests can exercise it directly)."""
     parser = argparse.ArgumentParser(description="Bi-weekly payroll helper.")
     parser.add_argument("step", choices=["read", "pay"], help="which step to run")
     parser.add_argument(
@@ -76,11 +81,25 @@ def main() -> None:
         default=date.today(),
         help="pay-period date as YYYY-MM-DD (default: today)",
     )
-    args = parser.parse_args()
+    parser.add_argument(
+        "--reader",
+        choices=["cloud", "local"],
+        default=None,
+        help="which timesheet reader to use for 'read' (default: READER env var, else 'cloud')",
+    )
+    return parser
+
+
+def main() -> None:
+    """Resolve the pay-period folder from the chosen date and run the step."""
+    args = build_parser().parse_args()
     folder = period_folder(args.date)
     if not folder.exists():
         raise FileNotFoundError(f"No folder for that date: {folder}")
-    {"read": read_step, "pay": pay_step}[args.step](folder)
+    if args.step == "read":
+        read_step(folder, args.reader)
+    else:
+        pay_step(folder)
 
 
 if __name__ == "__main__":
